@@ -1,0 +1,13 @@
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <form action="/elencoclienti" method = "GET">
+            {% for num, citta in tabella.items() %}
+                <p><input type = "radio" name = "citta" value = "{{citta}}" />{{citta}} ({{ num }})</p>
+            {% endfor %}
+            <p><input type = "submit" value = "Info" /></p>
+        </form>
+    </body>
+</html>
