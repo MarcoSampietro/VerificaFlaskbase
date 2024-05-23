@@ -3,6 +3,7 @@ import pandas as pd
 
 app = Flask(__name__)
 
+# Load the data
 dati_clienti = pd.read_csv('/workspace/VerificaFlaskbase/data/dati_clienti.csv')
 
 @app.route('/')
@@ -22,31 +23,41 @@ def clienti():
     info = dati_clienti[dati_clienti['City'] == citta]
     return render_template('clienti.html', tabella=info.to_html())
 
-@app.route('/elimina_cliente', methods=['POST'])
+@app.route('/elimina_cliente', methods=['GET', 'POST'])
 def elimina_cliente():
-    customer_id = int(request.form['customer_id'])
-    if customer_id in dati_clienti['CustomerID'].values:
-        dati_clienti = dati_clienti[dati_clienti['CustomerID'] != customer_id]
-        dati_clienti.to_csv('/workspace/VerificaFlaskbase/data/dati_clienti.csv', index=False)
-        return 'Cliente eliminato.'
-    else:
-        return 'Cliente inesistente.'
+    global dati_clienti
+    msg = ''
+    if request.method == 'POST':
+        customer_id = int(request.form['customer_id'])
+        if customer_id in dati_clienti['CustomerID'].values:
+            dati_clienti = dati_clienti[dati_clienti['CustomerID'] != customer_id]
+            dati_clienti.to_csv('/workspace/VerificaFlaskbase/data/dati_clienti.csv', index=False)
+            msg = 'Cliente eliminato.'
+        else:
+            msg = 'Cliente inesistente.'
+    
+    return render_template('elimina_cliente.html', msg=msg) 
 
-@app.route('/aggiungi_cliente', methods=['POST'])
+@app.route('/aggiungi_cliente', methods=['GET', 'POST'])
 def aggiungi_cliente():
-    new_row = {
-        'CustomerID': int(request.form['customer_id']),
-        'CustomerName': request.form['customer_name'],
-        'ContactName': request.form['contact_name'],
-        'Address': request.form['address'],
-        'City': request.form['city'],
-        'PostalCode': request.form['postal_code'],
-        'Country': request.form['country']
-    }
-    new_df = pd.DataFrame([new_row])
-    dati_clienti = pd.concat([dati_clienti, new_df], ignore_index=True)
-    dati_clienti.to_csv('/workspace/VerificaFlaskbase/data/dati_clienti.csv', index=False)
-    return 'Cliente aggiunto con successo!'
+    global dati_clienti
+    msg = ''
+    if request.method == 'POST':
+        new_row = {
+            'CustomerID': int(request.form['customer_id']),
+            'CustomerName': request.form['customer_name'],
+            'ContactName': request.form['contact_name'],
+            'Address': request.form['address'],
+            'City': request.form['city'],
+            'PostalCode': request.form['postal_code'],
+            'Country': request.form['country']
+        }
+        new_df = pd.DataFrame([new_row])
+        dati_clienti = pd.concat([dati_clienti, new_df], ignore_index=True)
+        dati_clienti.to_csv('/workspace/VerificaFlaskbase/data/dati_clienti.csv', index=False)
+        msg = 'Cliente aggiunto con successo!'
+    
+    return render_template('aggiungi_cliente.html', msg=msg)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=32457, debug=True)
