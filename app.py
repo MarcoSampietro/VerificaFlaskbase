@@ -3,7 +3,6 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# Load the data
 dati_clienti = pd.read_csv('/workspace/VerificaFlaskbase/data/dati_clienti.csv')
 
 @app.route('/')
@@ -35,7 +34,6 @@ def elimina_cliente():
             msg = 'Cliente eliminato.'
         else:
             msg = 'Cliente inesistente.'
-    
     return render_template('elimina_cliente.html', msg=msg) 
 
 @app.route('/aggiungi_cliente', methods=['GET', 'POST'])
@@ -56,7 +54,6 @@ def aggiungi_cliente():
         dati_clienti = pd.concat([dati_clienti, new_df], ignore_index=True)
         dati_clienti.to_csv('/workspace/VerificaFlaskbase/data/dati_clienti.csv', index=False)
         msg = 'Cliente aggiunto con successo!'
-    
     return render_template('aggiungi_cliente.html', msg=msg)
 
 if __name__ == '__main__':
